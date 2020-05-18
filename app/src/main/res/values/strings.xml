@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">EnviroCleanAdmin</string>
+
+    <string name="msg_no_internet">No internet connection available.</string>
+    <string name="google_maps_key">AIzaSyDIZslkzc_GsG2cniT_7OQrHEf7ZGXqWZ4</string>
+
+    <!--Common Validation Messages-->
+    <string name="blank_data">Please enter data</string>
+
+    <string name="blank_username">Please enter username</string>
+    <string name="blank_email">Please enter email address</string>
+    <string name="blank_first_name">Please enter first name</string>
+    <string name="blank_last_name">Please enter last name</string>
+    <string name="blank_phone">Please enter phone number</string>
+    <string name="blank_current_password">Please enter current password</string>
+    <string name="blank_new_password">Please enter new password</string>
+    <string name="blank_confirm_password">Please enter confirm password</string>
+
+    <string name="blank_title">Please enter title</string>
+    <string name="blank_desc">Please enter description</string>
+    <string name="blank_address">Please select valid address</string>
+    <string name="blank_assign_to">Please select assign to</string>
+
+    <string name="invalid">Invalid data</string>
+    <string name="msg_all_field_required">All fields are required.</string>
+    <string name="invalid_email">Please enter valid email</string>
+    <string name="blank_password">Please enter valid password</string>
+    <string name="invalid_confirm_password">Password and confirm password does not match</string>
+    <string name="invalid_password">Password length should be minimum 6 characters.</string>
+    <string name="invalid_phone">Please enter phone number between 10&#8211;15 digits.</string>
+    <string name="connection_timed_out">Connection Timed Out</string>
+
+    <!--<string name="invalid_password">Please enter valid password, password should be at least 6 characters long with 1 character and 1 number.</string>-->
+
+    <!-- Login Screen -->
+    <string name="lbl_login">Admin Login</string>
+    <string name="hint_email_or_phone_number">Email / Phone Number</string>
+    <string name="hint_password">Password</string>
+    <string name="lbl_remember_me">Remember Me</string>
+    <string name="lbl_forgot_password_">Forgot Password?</string>
+    <string name="lbl_sign_in">Sign in</string>
+
+
+    <!-- Forgot Password -->
+    <string name="lbl_forgot_desc">Enter your Email, We will send new\npassword to your Email.</string>
+    <string name="hint_email">Email</string>
+    <string name="lbl_send">Send</string>
+
+    <!--community screen-->
+    <string name="lbl_community">List Of Communities</string>
+</resources>
