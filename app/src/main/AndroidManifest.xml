@@ -27,7 +27,8 @@
         </activity>
         <activity android:name=".ui.activity.LoginActivity"/>
         <activity android:name=".ui.activity.ForgetPasswordActivity"/>
-        <activity android:name=".ui.activity.CommunityDetailsActivity"/>
+        <activity android:name=".ui.activity.CommunityDetailsActivity"
+            android:launchMode="singleTop"/>
         <activity android:name=".ui.activity.CommunityActivity"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"

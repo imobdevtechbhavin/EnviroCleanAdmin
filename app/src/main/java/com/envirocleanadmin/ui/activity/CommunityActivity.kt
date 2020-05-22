@@ -1,5 +1,6 @@
 package com.envirocleanadmin.ui.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,12 +18,9 @@ import com.envirocleanadmin.base.BaseBindingAdapter
 import com.envirocleanadmin.data.ApiService
 import com.envirocleanadmin.data.Prefs
 import com.envirocleanadmin.data.response.ListOfCommunityResponse
-import com.envirocleanadmin.data.response.LoginResponse
 import com.envirocleanadmin.databinding.ActivityCommunityBinding
 import com.envirocleanadmin.di.component.DaggerNetworkLocalComponent
 import com.envirocleanadmin.di.component.NetworkLocalComponent
-import com.envirocleanadmin.utils.ApiParam
-import com.envirocleanadmin.utils.AppConstants
 import com.envirocleanadmin.utils.AppUtils
 import com.envirocleanadmin.utils.RecycleViewCustom
 import com.envirocleanadmin.viewmodels.CommunityViewModel
@@ -34,11 +32,10 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     BaseBindingAdapter.ItemClickListener<ListOfCommunityResponse.Result?> {
 
 
-
     private lateinit var binding: ActivityCommunityBinding
     private lateinit var mViewModel: CommunityViewModel
 
-    lateinit var listOfCommunityResponse:ListOfCommunityResponse
+    lateinit var listOfCommunityResponse: ListOfCommunityResponse
 
     /*Injecting prefs from DI*/
     @Inject
@@ -52,6 +49,8 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     var from: String = ""
 
     companion object {
+        val REQUEST_CODE = 105
+        var IS_REFRESH=false
         fun newInstance(context: Context): Intent {
             val intent = Intent(context, CommunityActivity::class.java)
             return intent
@@ -75,10 +74,10 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     private fun init() {
         mViewModel.setInjectable(apiService, prefs)
         setToolBar(getString(R.string.lbl_community), R.color.pantone_072)
-        mViewModel.getListOfCommunityResponse().observe(this,commListResponseObserver)
+        mViewModel.getListOfCommunityResponse().observe(this, commListResponseObserver)
         val adapter = CommunityAdapter()
         adapter.filterable = true
-        adapter.itemClickListener=this
+        adapter.itemClickListener = this
         binding.rvView.setAdepter(adapter)
         binding.rvView.onLoadMoreItemClick = this
         binding.rvView.swipeToRefreshItemClick = this
@@ -142,30 +141,33 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
         })
 
     }
+
     private fun apiCall() {
-        mViewModel.callListOfCommApi(1,true)
+        mViewModel.callListOfCommApi(1, true)
     }
 
     private val commListResponseObserver = Observer<ListOfCommunityResponse> {
-      it.status?.let { status->
-          if(it.status){
-              it.result?.let {result->
-                  if(binding.rvView.CURENT_PAGE==1){
-                      listOfCommunityResponse=it
-                      binding.rvView.setTotalPages(it.pagination!!.lastPage!!)
+        it.status?.let { status ->
+            if (it.status) {
+                it.result?.let { result ->
+                    if (binding.rvView.CURENT_PAGE == 1) {
+                        listOfCommunityResponse = it
+                        binding.rvView.setTotalPages(it.pagination!!.lastPage!!)
 
-                      (binding.rvView.rvItems.adapter as CommunityAdapter).setItem(it.result)
-                      (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
-                  }else{
-                      (binding.rvView.rvItems.adapter as CommunityAdapter).removeFooterProgressItem(binding.rvView)
-                      (binding.rvView.rvItems.adapter as CommunityAdapter).addItems(it.result)
-                      (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
+                        (binding.rvView.rvItems.adapter as CommunityAdapter).setItem(it.result)
+                        (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
+                    } else {
+                        (binding.rvView.rvItems.adapter as CommunityAdapter).removeFooterProgressItem(
+                            binding.rvView
+                        )
+                        (binding.rvView.rvItems.adapter as CommunityAdapter).addItems(it.result)
+                        (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
 
-                  }
-              }
+                    }
+                }
 
-          }
-      }
+            }
+        }
     }
 
     override fun onSwipeToRefresh() {
@@ -173,16 +175,24 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     }
 
     override fun onLoadMore() {
-        mViewModel.callListOfCommApi(binding.rvView.CURENT_PAGE,false)
+        mViewModel.callListOfCommApi(binding.rvView.CURENT_PAGE, false)
     }
+
     override fun onItemClick(view: View, data: ListOfCommunityResponse.Result?, position: Int) {
         data?.let {
-
-            startActivity(CommunityDetailsActivity.newInstance(this,data.commName!!,data.commId!!.toString(),listOfCommunityResponse))
+            startActivityForResult(
+                CommunityDetailsActivity.newInstance(
+                    this,
+                    data.commName!!,
+                    data.commId!!.toString(),
+                    listOfCommunityResponse
+                ), REQUEST_CODE
+            )
             AppUtils.startFromRightToLeft(this)
 
         }
     }
+
     override fun getViewModel(): CommunityViewModel {
         mViewModel = ViewModelProvider(this).get(CommunityViewModel::class.java)
         return mViewModel
@@ -194,4 +204,16 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     override fun onClick(v: View?) {
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val result = data!!.getBooleanExtra("result",false)
+                if(IS_REFRESH){
+
+                    apiCall()
+                }
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.envirocleanadmin.ui.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -64,7 +65,7 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
     @Inject
     lateinit var apiService: ApiService
 
-
+    var isRefresh=false
     private val communityName: String by lazy {
         intent.getStringExtra(AppConstants.COMMUNITY_NAME)
     }
@@ -168,7 +169,7 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
                 it.result[i]!!.areaLongitude!!.toDouble()
             )
             reminder.message = it.result[i]!!.areaName
-            reminder.radius = it.result[i]!!.areaRange!!.toDouble()*1000
+            reminder.radius = it.result[i]!!.areaRange!!.toDouble() * 1000
             val latLong = LatLng(
                 it.result[i]!!.areaLatitude!!.toDouble(),
                 it.result[i]!!.areaLongitude!!.toDouble()
@@ -180,7 +181,8 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
         }
     }
     private val addCommAreaResponseObserver = Observer<AddCommunityResponse> {
-
+       CommunityActivity.IS_REFRESH=true
+        startActivity(intent)
     }
 
     private fun addReminder(
@@ -198,7 +200,7 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
                             list[i]!!.areaLongitude!!.toDouble()
                         )
                         reminder1.message = list[i]!!.areaName
-                        reminder1.radius = list[i]!!.areaRange!!.toDouble()*1000
+                        reminder1.radius = list[i]!!.areaRange!!.toDouble() * 1000
                         addReminder(reminder1, list)
                         break
                     }
@@ -243,7 +245,7 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
             if (clickMap) {
                 marker.remove()
             }
-            mLatLng=latLng
+            mLatLng = latLng
             clickMap = true
             Log.e("CLICK_LAT/LONG", "->" + latLng)
             getAddress(latLng)
@@ -354,7 +356,7 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
         btnSubmit.setOnClickListener {
-            if(!clickMap){
+            if (!clickMap) {
                 AppUtils.showSnackBar(btnSubmit, "Please selected location")
                 return@setOnClickListener
             }
@@ -366,7 +368,7 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
                 AppUtils.showSnackBar(btnSubmit, "Please set km")
                 return@setOnClickListener
             }
-            mViewModel.callAddCommApi(communityId,mLatLng,selectedKm,etAreaName.text.toString())
+            mViewModel.callAddCommApi(communityId, mLatLng, selectedKm, etAreaName.text.toString())
             dialog.dismiss()
         }
 
@@ -399,5 +401,17 @@ class CommunityDetailsActivity : BaseActivity<CommunityDetailsViewModel>(), View
         if (requestCode == MyLocationProvider.REQUEST_LOCATION_SETTINGS) {
             locationProvider?.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    override fun onBackPressed() {
+        finishActivity()
+        super.onBackPressed()
+    }
+
+    private fun finishActivity(){
+        val returnIntent = Intent()
+        returnIntent.putExtra("result", isRefresh)
+        setResult(Activity.RESULT_OK, returnIntent)
+        finish()
     }
 }
