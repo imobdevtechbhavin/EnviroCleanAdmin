@@ -7,8 +7,12 @@ import com.envirocleanadmin.EnviroCleanAdminApp
 import com.envirocleanadmin.R
 import com.envirocleanadmin.base.BaseViewModel
 import com.envirocleanadmin.data.db.AppDatabase
-import com.envirocleanadmin.data.response.LoginResponse
+import com.envirocleanadmin.data.response.AddCommunityResponse
+import com.envirocleanadmin.data.response.CommunityAreaListResponse
+import com.envirocleanadmin.utils.ApiParam
+import com.envirocleanadmin.utils.AppConstants
 import com.envirocleanadmin.utils.AppUtils
+import com.google.android.gms.maps.model.LatLng
 
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -29,18 +33,30 @@ class CommunityDetailsViewModel(application: Application) : BaseViewModel(applic
     /*RxJava Subscription object for api calling*/
     private var subscription: Disposable? = null
 
-    private val loginResponse: MutableLiveData<LoginResponse> by lazy {
-        MutableLiveData<LoginResponse>()
+    private val comunityAreaListResponse: MutableLiveData<CommunityAreaListResponse> by lazy {
+        MutableLiveData<CommunityAreaListResponse>()
     }
 
-    fun getLoginResponse(): LiveData<LoginResponse> {
-        return loginResponse
+    fun getCommunityAreaListResponse(): LiveData<CommunityAreaListResponse> {
+        return comunityAreaListResponse
     }
 
-    fun callLoginApi(params: HashMap<String, String>) {
+    private val addAreaResponse: MutableLiveData<AddCommunityResponse> by lazy {
+        MutableLiveData<AddCommunityResponse>()
+    }
+
+    fun getAddCommunityAreaResponse(): LiveData<AddCommunityResponse> {
+        return addAreaResponse
+    }
+
+    fun callListOfCommApi(commId:String) {
+
         if (AppUtils.hasInternet(getApplication())) {
+            val params:HashMap<String,Any> = HashMap()
+            params[ApiParam.DEVICE_TYPE]= AppConstants.DEVICE_TYPE_ANDROID
+            params[ApiParam.COMM_ID]= commId
             subscription = apiServiceObj
-                .apiLogin(params)
+                .apiCommunityArea(params)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe { onApiStart() }
@@ -52,8 +68,40 @@ class CommunityDetailsViewModel(application: Application) : BaseViewModel(applic
         }
     }
 
-    private fun handleResponse(response: LoginResponse) {
-        loginResponse.value = response
+    fun callAddCommApi(
+        commId: String,
+        latLong: LatLng,
+        km: Int,
+        areaName: String
+    ) {
+
+        if (AppUtils.hasInternet(getApplication())) {
+            val params:HashMap<String,Any> = HashMap()
+            params[ApiParam.DEVICE_TYPE]= AppConstants.DEVICE_TYPE_ANDROID
+            params[ApiParam.CENTER_LAT]= latLong.latitude
+            params[ApiParam.CENTER_LONG]= latLong.longitude
+            params[ApiParam.AREA_NAME]= areaName
+            params[ApiParam.RADIUS]= km
+            params[ApiParam.ID]= commId
+            subscription = apiServiceObj
+                .apiAddCommunityArea(params)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe { onApiStart() }
+                .doOnTerminate { onApiFinish() }
+                .subscribe(this::handleAddCommAreaResponse, this::handleError)
+
+        } else {
+            onInternetError()
+        }
+    }
+
+    private fun handleResponse(response: CommunityAreaListResponse) {
+        comunityAreaListResponse.value = response
+    }
+
+    private fun handleAddCommAreaResponse(response: AddCommunityResponse) {
+        addAreaResponse.value = response
     }
 
     private fun handleError(error: Throwable) {

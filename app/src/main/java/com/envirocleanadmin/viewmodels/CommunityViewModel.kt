@@ -7,7 +7,9 @@ import com.envirocleanadmin.EnviroCleanAdminApp
 import com.envirocleanadmin.R
 import com.envirocleanadmin.base.BaseViewModel
 import com.envirocleanadmin.data.db.AppDatabase
-import com.envirocleanadmin.data.response.LoginResponse
+import com.envirocleanadmin.data.response.ListOfCommunityResponse
+import com.envirocleanadmin.utils.ApiParam
+import com.envirocleanadmin.utils.AppConstants
 import com.envirocleanadmin.utils.AppUtils
 
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,31 +22,29 @@ import java.net.SocketTimeoutException
  */
 class CommunityViewModel(application: Application) : BaseViewModel(application) {
 
-    private lateinit var appDatabase: AppDatabase
-
-    fun setAppDatabase(appDatabase: AppDatabase) {
-        this.appDatabase = appDatabase
-    }
-
     /*RxJava Subscription object for api calling*/
     private var subscription: Disposable? = null
 
-    private val loginResponse: MutableLiveData<LoginResponse> by lazy {
-        MutableLiveData<LoginResponse>()
+    private val loginResponse: MutableLiveData<ListOfCommunityResponse> by lazy {
+        MutableLiveData<ListOfCommunityResponse>()
     }
 
-    fun getLoginResponse(): LiveData<LoginResponse> {
+    fun getListOfCommunityResponse(): LiveData<ListOfCommunityResponse> {
         return loginResponse
     }
 
-    fun callLoginApi(params: HashMap<String, String>,loginWithFab:Boolean=false) {
+    fun callListOfCommApi(pages: Int=1,showProgress: Boolean = true) {
         if (AppUtils.hasInternet(getApplication())) {
+            val params:HashMap<String,Any> = HashMap()
+            params[ApiParam.DEVICE_TYPE]= AppConstants.DEVICE_TYPE_ANDROID
+            params[ApiParam.LIMIT]= AppConstants.LIMIT
+            params[ApiParam.PAGE]= pages
             subscription = apiServiceObj
-                .apiLogin(params)
+                .apiCommunityList(params)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe { onApiStart() }
-                .doOnTerminate { onApiFinish() }
+                .doOnSubscribe { if (showProgress) onApiStart() }
+                .doOnTerminate { if (showProgress) onApiFinish() }
                 .subscribe(this::handleResponse, this::handleError)
 
         } else {
@@ -52,7 +52,7 @@ class CommunityViewModel(application: Application) : BaseViewModel(application) 
         }
     }
 
-    private fun handleResponse(response: LoginResponse) {
+    private fun handleResponse(response: ListOfCommunityResponse) {
         loginResponse.value = response
     }
 

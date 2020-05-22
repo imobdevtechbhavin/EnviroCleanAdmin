@@ -73,10 +73,10 @@ class NetworkModule {
                     val prefs = Prefs.getInstance(context)
                     prefs?.let {
                         if(it.isLoggedIn){
-                          /*  val user = it.userDataModel
+                            val user = it.userDataModel
                             user?.let {
                                 requestBuilder.header("Authorization", "Bearer "+ it.result?.token)
-                            }*/
+                            }
                         }
                     }
                     requestBuilder.header("Accept-Language", "en")

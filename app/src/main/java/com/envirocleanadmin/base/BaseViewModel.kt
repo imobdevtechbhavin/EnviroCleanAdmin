@@ -17,7 +17,6 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
     val apiErrorMessage: MutableLiveData<String> = MutableLiveData()
     val loadingVisibility: MutableLiveData<Boolean> = MutableLiveData()
-    val horizontalPb: MutableLiveData<Boolean> = MutableLiveData()
 
     protected lateinit var apiServiceObj: ApiService
     protected lateinit var prefsObj: Prefs

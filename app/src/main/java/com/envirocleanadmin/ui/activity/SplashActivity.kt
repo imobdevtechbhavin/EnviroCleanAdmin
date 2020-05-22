@@ -1,9 +1,14 @@
 package com.envirocleanadmin.ui.activity
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.envirocleanadmin.R
@@ -28,7 +33,11 @@ class SplashActivity : BaseActivity<SplashViewModel>() {
             return intent
         }
     }
-
+    val PERMISSION_REQUEST_CODE = 1
+    var ALL_PERMISSIONS = 101
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION
+    )
     private lateinit var mViewModel: SplashViewModel
     private lateinit var binding: ActivitySplashBinding
     private var handler: Handler? = null
@@ -99,12 +108,39 @@ class SplashActivity : BaseActivity<SplashViewModel>() {
         super.onPause()
         handler!!.removeCallbacks(mRunnable)
     }
+    fun isStoragePermissionGranted(): Boolean {
+        if (Build.VERSION.SDK_INT >= 23) {
 
+            if ( checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Log.v("TAG", "Permission is granted")
+                return true
+            } else {
+
+                Log.v("TAG", "Permission is revoked")
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ),
+                    1
+                )
+                return false
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("TAG", "Permission is granted")
+            startApp()
+            return true
+        }
+    }
     private fun startApp() {
+        ActivityCompat.requestPermissions(this, permissions, ALL_PERMISSIONS);
+        if(!isStoragePermissionGranted()){
+            return
+        }
         /*Either user is logged in or has skipped the login
             * then we will redirect him to MainActivity*/
-        if (prefs.isLoggedIn || prefs.isSkipped) {
-            startActivity(LoginActivity.newInstance(this))
+        if (prefs.isLoggedIn) {
+            startActivity(CommunityActivity.newInstance(this))
             AppUtils.startFromRightToLeft(this)
         } else {
             // Otherwise we will start from the starch
@@ -115,6 +151,38 @@ class SplashActivity : BaseActivity<SplashViewModel>() {
         finishAffinity()
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            0 -> {
+                var isPerpermissionForAllGranted = false
+                if (grantResults.size > 0 && permissions.size == grantResults.size) {
+                    for (i in permissions.indices) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            isPerpermissionForAllGranted = true
+                        } else {
+                            isPerpermissionForAllGranted = false
+                        }
+                    }
+                    startApp()
+                    Log.e("value", "Permission Granted, Now you can use local drive .")
+                } else {
+                    isPerpermissionForAllGranted = true
+                    AppUtils.showSnackBar(
+                        binding.tvDisplayVersion,
+                        "To get access enable locations from settings"
+                    )
+                    Log.e("value", "Permission Denied, You cannot use local drive .")
+                }
+                if (isPerpermissionForAllGranted) {
+                    startApp()
+                }
+            }
+        }
+    }
 }
 
 

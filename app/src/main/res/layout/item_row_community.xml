@@ -30,7 +30,7 @@
                     style="@style/poppins_medium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Community Name"
+                    android:text="Community Name----->"
                     android:textColor="@color/Black_title"
                     android:textSize="@dimen/_15ssp"
                     app:layout_constraintStart_toStartOf="parent"

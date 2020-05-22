@@ -12,7 +12,7 @@ import com.envirocleanadmin.utils.AppConstants
 import com.envirocleanadmin.utils.AppUtils
 import com.envirocleanadmin.utils.validator.ValidationErrorModel
 import com.envirocleanadmin.utils.validator.Validator
-import com.krystal.goddesslifestyle.utils.ApiParam
+import com.envirocleanadmin.utils.ApiParam
 
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable

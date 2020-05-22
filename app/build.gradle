@@ -17,6 +17,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+        archivesBaseName = "EnviroClean_Admin_App_" + versionCode + "_" + new Date().format('dd-MM-yyyy')
+
     }
     buildTypes {
         release {
@@ -111,5 +113,7 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:2.2.0'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
 }

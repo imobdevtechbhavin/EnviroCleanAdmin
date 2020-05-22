@@ -5,13 +5,16 @@ import com.envirocleanadmin.di.component.*
 import com.envirocleanadmin.di.module.AppModule
 import com.envirocleanadmin.di.module.LocalDataModule
 import com.envirocleanadmin.di.module.NetworkModule
+import com.envirocleanadmin.geofancing.ReminderRepository
 
 
 class EnviroCleanAdminApp : Application() {
+    private lateinit var repository: ReminderRepository
 
 
     override fun onCreate() {
         super.onCreate()
+        repository = ReminderRepository(this)
     }
 
 
@@ -29,6 +32,6 @@ class EnviroCleanAdminApp : Application() {
         return DaggerNetworkComponent.builder().appComponent(getAppComponent())
             .networkModule(NetworkModule()).build()
     }
-
+    fun getRepository() = repository
 
 }

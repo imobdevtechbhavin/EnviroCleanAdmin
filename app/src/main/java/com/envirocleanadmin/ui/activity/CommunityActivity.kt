@@ -16,10 +16,14 @@ import com.envirocleanadmin.base.BaseActivity
 import com.envirocleanadmin.base.BaseBindingAdapter
 import com.envirocleanadmin.data.ApiService
 import com.envirocleanadmin.data.Prefs
+import com.envirocleanadmin.data.response.ListOfCommunityResponse
 import com.envirocleanadmin.data.response.LoginResponse
 import com.envirocleanadmin.databinding.ActivityCommunityBinding
 import com.envirocleanadmin.di.component.DaggerNetworkLocalComponent
 import com.envirocleanadmin.di.component.NetworkLocalComponent
+import com.envirocleanadmin.utils.ApiParam
+import com.envirocleanadmin.utils.AppConstants
+import com.envirocleanadmin.utils.AppUtils
 import com.envirocleanadmin.utils.RecycleViewCustom
 import com.envirocleanadmin.viewmodels.CommunityViewModel
 import javax.inject.Inject
@@ -27,15 +31,15 @@ import javax.inject.Inject
 
 class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListener,
     RecycleViewCustom.onLoadMore, RecycleViewCustom.onSwipeToRefresh,
-    BaseBindingAdapter.ItemClickListener<String> {
+    BaseBindingAdapter.ItemClickListener<ListOfCommunityResponse.Result?> {
 
 
 
     private lateinit var binding: ActivityCommunityBinding
     private lateinit var mViewModel: CommunityViewModel
 
+    lateinit var listOfCommunityResponse:ListOfCommunityResponse
 
-    private var isShowPassword = false
     /*Injecting prefs from DI*/
     @Inject
     lateinit var prefs: Prefs
@@ -43,7 +47,7 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     /*Injecting apiService*/
     @Inject
     lateinit var apiService: ApiService
-
+    var CURRENT_PAGE: Int = 1
 
     var from: String = ""
 
@@ -71,14 +75,14 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
     private fun init() {
         mViewModel.setInjectable(apiService, prefs)
         setToolBar(getString(R.string.lbl_community), R.color.pantone_072)
-        mViewModel.getLoginResponse().observe(this, loginResponseObserver)
+        mViewModel.getListOfCommunityResponse().observe(this,commListResponseObserver)
         val adapter = CommunityAdapter()
         adapter.filterable = true
         adapter.itemClickListener=this
         binding.rvView.setAdepter(adapter)
         binding.rvView.onLoadMoreItemClick = this
         binding.rvView.swipeToRefreshItemClick = this
-        setData()
+        apiCall()
     }
 
     private fun setToolBar(title: String, bgColor: Int) {
@@ -138,53 +142,45 @@ class CommunityActivity : BaseActivity<CommunityViewModel>(), View.OnClickListen
         })
 
     }
-    private fun setData() {
-        val list: ArrayList<String?> = ArrayList()
-        list.add("Comm1")
-        list.add("Comm2")
-        list.add("Comm3")
-        list.add("Comm4")
-        list.add("Comm5")
-        list.add("Comm6")
-        list.add("Comm7")
-        list.add("Comm8")
-        list.add("Comm9")
-        list.add("Comm10")
-        list.add("Comm11")
-        list.add("Comm12")
-        list.add("Comm13")
-        list.add("Comm14")
-        list.add("Comm15")
-        list.add("Comm16")
-        list.add("Comm17")
-        list.add("Comm18")
-        list.add("Comm19")
-        list.add("Comm20")
-        list.add("Comm21")
-        list.add("Comm22")
-        list.add("Comm23")
-        list.add("Comm24")
-        list.add("Comm25")
-
-
-        (binding.rvView.rvItems.adapter as CommunityAdapter).setItem(list)
-        (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
+    private fun apiCall() {
+        mViewModel.callListOfCommApi(1,true)
     }
 
-    private val loginResponseObserver = Observer<LoginResponse> {
+    private val commListResponseObserver = Observer<ListOfCommunityResponse> {
+      it.status?.let { status->
+          if(it.status){
+              it.result?.let {result->
+                  if(binding.rvView.CURENT_PAGE==1){
+                      listOfCommunityResponse=it
+                      binding.rvView.setTotalPages(it.pagination!!.lastPage!!)
 
+                      (binding.rvView.rvItems.adapter as CommunityAdapter).setItem(it.result)
+                      (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
+                  }else{
+                      (binding.rvView.rvItems.adapter as CommunityAdapter).removeFooterProgressItem(binding.rvView)
+                      (binding.rvView.rvItems.adapter as CommunityAdapter).addItems(it.result)
+                      (binding.rvView.rvItems.adapter as CommunityAdapter).notifyDataSetChanged()
+
+                  }
+              }
+
+          }
+      }
     }
 
     override fun onSwipeToRefresh() {
-
+        apiCall()
     }
 
     override fun onLoadMore() {
-
+        mViewModel.callListOfCommApi(binding.rvView.CURENT_PAGE,false)
     }
-    override fun onItemClick(view: View, data: String?, position: Int) {
+    override fun onItemClick(view: View, data: ListOfCommunityResponse.Result?, position: Int) {
         data?.let {
-            startActivity(CommunityDetailsActivity.newInstance(this,data))
+
+            startActivity(CommunityDetailsActivity.newInstance(this,data.commName!!,data.commId!!.toString(),listOfCommunityResponse))
+            AppUtils.startFromRightToLeft(this)
+
         }
     }
     override fun getViewModel(): CommunityViewModel {

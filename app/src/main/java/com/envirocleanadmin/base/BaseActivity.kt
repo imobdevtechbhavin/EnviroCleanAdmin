@@ -133,6 +133,13 @@ abstract class BaseActivity<T : BaseViewModel> : AppCompatActivity() {
     fun setToolbarTitle(title: String) {
         initToolbar()
         toolbarBinding.tvToolbarTitle.text = title
+        toolbarBinding.tvToolbarTitle.visibility = View.VISIBLE
+    }
+    fun setToolbarSpinner(title: String) {
+        initToolbar()
+        toolbarBinding.tvToolbarSpinner.text = title
+        toolbarBinding.tvToolbarSpinner.visibility = View.VISIBLE
+
     }
 
     // set icon of toolbar left icon
@@ -187,16 +194,14 @@ abstract class BaseActivity<T : BaseViewModel> : AppCompatActivity() {
     fun showProgress() {
         if (progressDialog == null) {
             progressDialog = Dialog(this)
-        }/* else {
-            return
-        }*/
+            progressDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        }
         val view = LayoutInflater.from(this).inflate(R.layout.app_loading_dialog, null, false)
         val imageView1 = view.findViewById<ImageView>(R.id.imageView2)
         val a1 = AnimationUtils.loadAnimation(this, R.anim.progress_anim)
         a1.duration = 1500
         imageView1.startAnimation(a1)
 
-        progressDialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
         progressDialog?.setContentView(view)
         val window = progressDialog?.window
         window?.setBackgroundDrawable(ContextCompat.getDrawable(this, android.R.color.transparent))
@@ -371,4 +376,6 @@ abstract class BaseActivity<T : BaseViewModel> : AppCompatActivity() {
     fun getEditTextView(): EditText {
         return toolbarBinding.edtSearch
     }
+
+    fun getRepository() = (application as EnviroCleanAdminApp).getRepository()
 }

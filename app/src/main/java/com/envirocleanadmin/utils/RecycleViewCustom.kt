@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.envirocleanadmin.R
+import com.envirocleanadmin.adapter.CommunityAdapter
 import com.envirocleanadmin.base.BaseBindingAdapter
 import com.envirocleanadmin.databinding.RecycleviewLayoutBinding
 
@@ -76,6 +77,8 @@ class RecycleViewCustom : LinearLayout {
         isSwipeToRefresh.let {
             if (isSwipeToRefresh) {
                 binding.swipeContainer.setOnRefreshListener {
+                    isLoading()
+                    (binding.rvItems.adapter as BaseBindingAdapter<*>).clear()
                     binding.swipeContainer.isRefreshing = false
                     swipeToRefreshItemClick?.onSwipeToRefresh()
                     CURENT_PAGE = 1

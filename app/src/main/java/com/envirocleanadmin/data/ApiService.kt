@@ -1,6 +1,9 @@
 package com.envirocleanadmin.data
 
 import com.envirocleanadmin.base.BaseResponse
+import com.envirocleanadmin.data.response.AddCommunityResponse
+import com.envirocleanadmin.data.response.CommunityAreaListResponse
+import com.envirocleanadmin.data.response.ListOfCommunityResponse
 import com.envirocleanadmin.data.response.LoginResponse
 
 import io.reactivex.Observable
@@ -24,11 +27,23 @@ interface ApiService {
     fun apiUpdateProfile(@PartMap params: HashMap<String, RequestBody>): Observable<BaseResponse>*/
     // [END] Demo APIs
 
-    @Multipart
+    @FormUrlEncoded
     @POST("admin/login")
-    fun apiLogin(@PartMap params: HashMap<String, String>): Observable<LoginResponse>
+    fun apiLogin(@FieldMap params: HashMap<String, String>): Observable<LoginResponse>
 
-    @Multipart
+    @FormUrlEncoded
     @POST("password/email")
-    fun apiForgotPassword(@PartMap params: HashMap<String, String>): Observable<BaseResponse>
+    fun apiForgotPassword(@FieldMap params: HashMap<String, String>): Observable<BaseResponse>
+
+    @FormUrlEncoded
+    @POST("admin/get_list_of_communities")
+    fun apiCommunityList(@FieldMap params: HashMap<String, Any>): Observable<ListOfCommunityResponse>
+
+    @FormUrlEncoded
+    @POST("admin/get_all_communities_areas")
+    fun apiCommunityArea(@FieldMap params: HashMap<String, Any>): Observable<CommunityAreaListResponse>
+
+    @FormUrlEncoded
+    @POST("admin/create_area")
+    fun apiAddCommunityArea(@FieldMap params: HashMap<String, Any>): Observable<AddCommunityResponse>
 }

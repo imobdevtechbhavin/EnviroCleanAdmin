@@ -83,6 +83,8 @@ class LoginActivity : BaseActivity<LoginViewModel>(), View.OnClickListener {
                 if (status) {
                     prefs.userDataModel = it
                     prefs.isLoggedIn = true
+                    startActivity(CommunityActivity.newInstance(this))
+                    AppUtils.startFromRightToLeft(this)
                 } else {
                     it.message?.let { message ->
                         it

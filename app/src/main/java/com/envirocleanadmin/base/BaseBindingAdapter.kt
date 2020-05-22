@@ -75,14 +75,14 @@ abstract class BaseBindingAdapter<T> : RecyclerView.Adapter<BaseBindingViewHolde
     /*Adding footer progress bar while performing load more*/
     fun addFooterProgressItem() {
         items.add(null)
-        if (filterable) allItems.add(null)
+      //  if (filterable) allItems.add(null)
         notifyItemInserted((items.size - 1))
     }
 
     /*Remove footer progress bar while load more of data completes*/
     fun removeFooterProgressItem(customView: RecycleViewCustom) {
         items.removeAt(items.size - 1)
-        if (filterable) allItems.removeAt(items.size - 1)
+      //  if (filterable) allItems.removeAt(items.size - 1)
         val scrollPosition = items.size
         notifyItemRemoved(scrollPosition)
         customView.isLoading()

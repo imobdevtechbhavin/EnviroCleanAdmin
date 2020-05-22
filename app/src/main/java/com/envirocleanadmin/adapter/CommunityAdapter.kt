@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import com.envirocleanadmin.base.BaseBindingAdapter
 import com.envirocleanadmin.base.BaseBindingViewHolder
+import com.envirocleanadmin.data.response.ListOfCommunityResponse
 import com.envirocleanadmin.databinding.ItemRowCommunityBinding
 import com.envirocleanadmin.databinding.LoadMoreProgressBinding
 
@@ -12,45 +13,31 @@ import com.envirocleanadmin.databinding.LoadMoreProgressBinding
 /**
  * Created by imobdev on 23/3/20
  */
-class CommunityAdapter : BaseBindingAdapter<String>() {
-    val ITEM = 0
-    val LOADING = 1
-    lateinit var viewHolder: ViewDataBinding
-    private var isLoadingAdded = false
+class CommunityAdapter : BaseBindingAdapter<ListOfCommunityResponse.Result?>() {
+
+
     override fun bind(inflater: LayoutInflater, parent: ViewGroup, viewType: Int): ViewDataBinding {
-        when (viewType) {
-            ITEM ->
-                viewHolder = ItemRowCommunityBinding.inflate(inflater, parent, false)
-            LOADING -> {
-                viewHolder = LoadMoreProgressBinding.inflate(inflater, parent, false)
-            }
-        }
-        return viewHolder
+        return  ItemRowCommunityBinding.inflate(inflater, parent, false)
     }
 
     override fun onBindViewHolder(holder: BaseBindingViewHolder, position: Int) {
 
         when (getItemViewType(position)) {
-            ITEM -> {
+            VIEW_TYPE_ITEM -> {
                 val binding = holder.binding as ItemRowCommunityBinding
                 val item = items[position]
                 item?.let {
-                    binding.tvCommunitiesName.text=item
+                   binding.tvCommunitiesName.text=item.commName
+                   binding.tvCommunitiesArea.text=""+item.areaCount+" area under this community"
                 }
             }
-            LOADING -> {
 
-            }
         }
 
     }
 
-    override
-    fun getItemViewType(position: Int): Int {
-        return if (position == items.size - 1 && isLoadingAdded) LOADING else ITEM
-    }
     fun filter(string: String) {
-        items = ArrayList(allItems.filter { it!!.toLowerCase().contains(string.toLowerCase()) })
+        items = ArrayList(allItems.filter { it!!.commName!!.toLowerCase().contains(string.toLowerCase()) })
         notifyDataSetChanged()
     }
 }

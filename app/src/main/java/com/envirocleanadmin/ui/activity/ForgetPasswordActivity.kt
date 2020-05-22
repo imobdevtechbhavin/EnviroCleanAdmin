@@ -19,7 +19,7 @@ import com.envirocleanadmin.di.component.NetworkLocalComponent
 import com.envirocleanadmin.utils.AppConstants
 import com.envirocleanadmin.utils.AppUtils
 import com.envirocleanadmin.viewmodels.ForgetPasswordModel
-import com.krystal.goddesslifestyle.utils.ApiParam
+import com.envirocleanadmin.utils.ApiParam
 import javax.inject.Inject
 
 class ForgetPasswordActivity : BaseActivity<ForgetPasswordModel>() {

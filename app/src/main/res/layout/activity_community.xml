@@ -32,10 +32,10 @@
                 android:id="@+id/rvView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="@dimen/_8sdp"
-                app:is_load_more="false"
-                app:is_swipe_refresh_layout="false"
                 app:layout_constraintTop_toTopOf="parent"
+                android:layout_margin="@dimen/_8sdp"
+                app:is_load_more="true"
+                app:is_swipe_refresh_layout="true"
                 app:rv_span_count="2"
                 app:set_layout_manager="LinearLayoutManager" />
         </androidx.constraintlayout.widget.ConstraintLayout>
